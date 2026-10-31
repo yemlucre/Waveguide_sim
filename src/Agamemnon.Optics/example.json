@@ -1,0 +1,15 @@
+{
+  "parameters": {
+    "wavelength_um": 0.78,
+    "background_index": 1.45,
+    "delta_index": 0.003,
+    "radius_um": 2.5,
+    "separation_um": 12.0,
+    "window_um": 120.0,
+    "points": 512,
+    "step_um": 2.0,
+    "length_um": 20000.0
+  },
+  "separations_um": [10.0, 12.0, 14.0, 16.0, 18.0],
+  "target": 0.5
+}

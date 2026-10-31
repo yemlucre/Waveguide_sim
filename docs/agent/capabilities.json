@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "application": "波导理论仿真",
+  "reviewedOn": "2026-10-30",
+  "runtimeToolRegistry": false,
+  "agentBridgeImplemented": false,
+  "capabilities": [
+    {
+      "id": "optics.theoretical_coupler",
+      "status": "implemented",
+      "agentExposed": false,
+      "scope": "standalone_python_theory_not_desktop_loaded",
+      "source": "src/Agamemnon.Optics/optics.py",
+      "serviceSource": "src/Agamemnon.Optics/run.py",
+      "operation": "propagate: 1+1D paraxial split-step FFT; find_design: bounded discrete spacing scan and first half-space target crossing; verify_candidate: mesh/step/window and spectral comparisons. CLI simulate-optics.ps1 exports offline HTML/PNG/NPZ/JSON; no MCP, UI button or device operation. Report v2 adds offline sampled propagation playback, transverse profiles, comparison, parameter/diagnostic cards and local CSV/PNG downloads; no solver extension.",
+      "verification": "2026-10-30: solver unchanged; 9 numerical and 3 report contract tests; default full CLI and browser interaction/layout checks. See docs/reports/report-v2-20261030.md for evidence and scope.",
+      "limitations": "Assumed 780 nm / n0 1.45 / delta-n 0.003 / radius 2.5 um. One transverse dimension, periodic boundary, no physical loss, polarization, reflection, 3D, separated ports or process calibration. Half-space power is not modal port efficiency. No hardware mapping, machining export or registered agent tool. Only selected candidate receives refinement.",
+      "reportSource": "src/Agamemnon.Optics/report.py",
+      "templateSource": "src/Agamemnon.Optics/report_template.html",
+      "interactionSource": "src/Agamemnon.Optics/report_ui.js"
+    },
+    {
+      "id": "optics.lamp_modal_correlation",
+      "status": "implemented",
+      "agentExposed": false,
+      "scope": "standalone_python_paper_inspired_modal_demo",
+      "source": "src/Agamemnon.Optics/lamp.py",
+      "serviceSource": "src/Agamemnon.Optics/run_lamp.py",
+      "reportSource": "src/Agamemnon.Optics/lamp_report.py",
+      "templateSource": "src/Agamemnon.Optics/lamp_report_template.html",
+      "interactionSource": "src/Agamemnon.Optics/lamp_report_ui.js",
+      "operation": "LAMP-inspired 9-channel lossless CMT on assumed 3D paths; analytic-gradient ideal phase programming of one normalized transfer row; valid stride-1 3x3 correlation, separate coherent signed field and direct intensity outputs. simulate-optics.ps1 -Scenario lamp, no agent/MCP exposure.",
+      "verification": "2026-10-30: 21 numerical/report checks passed; four kernels fit row L2 around 1e-6, half-step operator differences around 1..2e-6, random-complex-input and three-image evaluation. Browser and provenance evidence in docs/reports/lamp-convolution-20261030.md.",
+      "limitations": "Not authors 64-channel chip, CNN/MNIST reproduction or continuous 2+1D BPM. 90mm/3-stage/9-channel radial paths and ideal per-channel phase masks assumed. Paper C(d) 10..17um fit is extrapolated isotropically. No bend/radiation/material loss, detuning from path length, thermal model, phase-only SLM input or physical coherent receiver. One kernel per phase program, programmatic sliding windows. Signed readout requires additional ideal phase reference."
+    },
+    {
+      "id": "optics.general_paraxial_bpm",
+      "status": "implemented",
+      "agentExposed": false,
+      "scope": "standalone_python_scalar_1or2_transverse_dimensions",
+      "source": "src/waveguide_sim/bpm.py",
+      "serviceSource": "src/Agamemnon.Optics/run_bpm.py",
+      "operation": "Midpoint Strang FFT in 1+1D or 2+1D; z-varying Gaussian multi-guide center/radius/index knots; arbitrary complex launch and real weak index callback in Python API; JSON Gaussian input and bounded single-path parameter scan; rectangular ROI power; per-candidate complex-field convergence; offline report and JSON/NPZ/manifest. No runtime agent registration. Python Scene API v1 (python_scene.py) and root simulate.py: trusted absolute-index and complex-field functions, full callback refinement, assumed target-template overlap objective, per-candidate scans, sampled index/target NPZ and intensity/phase/index report. Default Python scene scene_example.py.",
+      "verification": "2026-10-30: 36 total scientific/report tests passed; field-only study without a design objective, custom callback refinement, exact z-varying uniform potential, analytic phase-sensitive template projection, non-Gaussian 2D scenes, input/ROI/parameter validation and fixed-grid rejection. Full Python entry and gap-scan E2E; see docs/reports/python-scenes-20261030.md.",
+      "limitations": "All example physical parameters assumed. Scalar forward paraxial weak-index approximation; periodic boundaries, no absorber, vector/reflection/nonlinearity/physical absorption/process calibration. ROI power is not modal port efficiency. 2+1D is not full-vector 3D Maxwell. Custom callbacks support automatic refinement through Scene API; functions must be deterministic and evaluated in physical coordinates. Trusted Python modules execute code, no isolation; no recursive external-import provenance. Target is a supplied template, not automatically a guided eigenmode. No tool registry, device mapping or global optimizer.",
+      "contract": "docs/agent/general-bpm.md",
+      "sceneSource": "src/Agamemnon.Optics/python_scene.py",
+      "pythonEntryPoint": "simulate.py"
+    },
+    {
+      "id": "optics.rk4_field_simulation",
+      "status": "implemented",
+      "agentExposed": false,
+      "scope": "installable_python_package_scalar_paraxial_theory",
+      "source": "src/waveguide_sim/solver.py",
+      "geometrySource": "src/waveguide_sim/geometry.py",
+      "pythonEntryPoint": "src/waveguide_sim/__main__.py",
+      "contract": "docs/agent/rk4-package.md",
+      "operation": "simulate(Grid, absolute_index_callback_or_Waveguide, complex_array_or_launch_callable): Fourier transverse Laplacian, classical four-stage fourth-order RK4 along z, every-step transverse field history by default, amplitude/phase preservation without normalization; numeric NPZ export refuses overwrite. check_convergence rebuilds launch and geometry on half-step, half-spacing and enlarged-window grids. No UI/device/Agent dependency.",
+      "verification": "See docs/reports/rk4-package-20261030.md: analytical complex plane-wave and z-varying-index fourth-order rates, 2D Gaussian diffraction, bending guide refinements, invalid/stability/boundary failure and NPZ contract; full legacy regression and installed-package E2E.",
+      "limitations": "All demo physical parameters assumed_not_measured. Scalar forward weak-index paraxial model, one/two transverse dimensions, periodic boundary, no absorber/reflection/polarization/nonlinearity/CAD import/calibration or registered Agent tools. Explicit RK4 has a conservative grid-dependent step bound and is not exactly unitary. All positions means discrete grid nodes; 16 million stored complex values, max 100000 steps. Trusted coordinate callbacks must be deterministic and resolvable; discontinuities can reduce convergence order. Supplied field units determine intensity/power units. Legacy simulate.py still uses split-step reporting."
+    }
+  ]
+}

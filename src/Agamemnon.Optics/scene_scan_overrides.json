@@ -1,0 +1,1 @@
+{"parameters":{"dimensions":1,"samples":11},"scan":{"parameter":"gap_um","values":[8.0,10.0,12.0]},"objective":"target_overlap"}

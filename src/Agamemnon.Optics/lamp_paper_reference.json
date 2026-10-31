@@ -1,0 +1,28 @@
+{
+  "checkedOn": "2026-10-30",
+  "title": "Programmable Three-dimensional Photonic Neural Network Chip",
+  "doi": "10.1038/s41467-026-72316-9",
+  "article_url": "https://www.nature.com/articles/s41467-026-72316-9",
+  "original_source_library": "D:\\Destop\\Agamemnon\\WaveguideLibrary\\Cao2026_Programmable3D_PNN",
+  "local_source_sha256": {
+    "article.pdf": "2ca420738eea97a65aa99da199fdf920f6c4c9a924efa3f03b7349402dc68577",
+    "supplementary.pdf": "b2d08f7706a750b88b4758ce0a28b9a1679131084abba24359d69d60482ec169"
+  },
+  "visually_verified": "SI PDF page 10, Fig.4b and equation: C=6.1688 exp(-0.2641 d), C mm^-1, d um, measured 10..17 um",
+  "sources": [
+    {
+      "locator": "main text: principles and in-situ classification",
+      "fact": "mixing and phase programming; 64-channel 8x8 experimental chip, image classification/pattern generation, not a reported standard CNN"
+    },
+    {
+      "locator": "SI p.5 Note2 / Fig.2a",
+      "fact": "9-channel 3x3 ideal concept, difficult bend/loss considerations; no full numerical geometry published"
+    },
+    {
+      "locator": "SI p.10 Note3 / Fig.4b",
+      "fact": "two-guide exponential coupling fit, not a full 3D angular/wavelength calibration"
+    }
+  ],
+  "geometry_origin": "assumed parameters from previously generated concept-9-demo, all 90 mm/three-stage/radial expansion dimensions remain assumed",
+  "paper_not_reproduced": true
+}
