@@ -3,6 +3,7 @@
 检查日期：2026-10-31。当前只维护 `waveguide_sim` Python/RK4 包；原报告、场景脚本、双波导/LAMP/分步求解流程及相关测试已删除。
 
 - [项目使用说明](../../README.md)
+- [从安装到自定义仿真的教程](../tutorial.md)
 - [Python/RK4 完整契约](rk4-package.md)：物理模型、单位、坐标、输入输出、采样、稳定性与收敛。
 - [能力清单](capabilities.json)：仅1项独立理论能力，agentExposed=false。
 - [本轮清理与验证记录](../reports/python-only-20261031.md)
