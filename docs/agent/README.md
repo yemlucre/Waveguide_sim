@@ -6,6 +6,8 @@
 - [从安装到自定义仿真的教程](../tutorial.md)
 - [Python/RK4 完整契约](rk4-package.md)：物理模型、单位、坐标、输入输出、采样、稳定性与收敛。
 - [能力清单](capabilities.json)：仅1项独立理论能力，agentExposed=false。
+- [Matplotlib依赖与教程绘图验证](../reports/matplotlib-20261031.md)：第四节集成绘图/查询、第九节读取已有NPZ。
+- [光场滑块查看器验证](../reports/field-viewer-20261031.md)：一次读取完整已保存光场，以x/y/z滑块查看截面和复场。
 - [本轮清理与验证记录](../reports/python-only-20261031.md)
 - [首次RK4包验证记录（历史）](../reports/rk4-package-20261030.md)
 

@@ -6,7 +6,7 @@
 
 第一次使用请看 [从安装到自定义仿真的完整教程](docs/tutorial.md)，包含可运行脚本、形状/入射场定义、读取数据、绘图及收敛排查。
 
-需要 Python 3.10+ 和 NumPy。在项目根目录执行：
+需要 Python 3.10+；安装时会一并安装 NumPy 和 Matplotlib。在项目根目录执行（已安装旧版也请重新执行安装命令以补齐依赖）：
 
 ```powershell
 python -m pip install -e .
@@ -14,6 +14,16 @@ python -m waveguide_sim
 ```
 
 也可直接从源码运行 `python simulate.py`。两种入口执行同一个 RK4 示例，默认写入新的 `artifacts/rk4/<时间戳>/`。用 `--output 新目录` 指定输出，已有目录拒绝覆盖。
+
+教程[第四节的完整脚本](docs/tutorial.md#4-写第一个自己的仿真程序)会在保存 `fields.npz` 后生成 `propagation.png`，并显示传播与输出强度图；脚本顶部列明需要修改的参数。已有 NPZ 可按教程第九节直接读入画图，无需重新仿真。内置命令行示例仍只计算和导出数据。
+
+默认打开光场滑块查看器：拖动z查看截面强度和相位，拖动x/y选择网格点并读取复场。`STORE_EVERY=1` 保存每个传播步；观察时不重算。已有二维NPZ可直接打开：
+
+```powershell
+python -m waveguide_sim.viewer "artifacts/实际运行目录/fields.npz"
+```
+
+Python中使用 `from waveguide_sim.viewer import view_field, view_npz`；`view_field(result.field, result.axes_um, result.z_um)` 浏览内存结果，`view_npz('路径/fields.npz')` 一次读入保存的数据。需要支持交互的Matplotlib后端；普通脚本运行可弹出窗口，Notebook的静态inline图片不支持滑块拖动。
 
 ## 在 Python 中使用
 
@@ -41,6 +51,7 @@ result.save('new_fields.npz')
 
 - `src/waveguide_sim/`：网格、几何/输入场、RK4 求解器和 Python 示例入口。
 - `tests/test_optics_rk4.py`：解析解、四阶收敛、几何/边界/稳定性和数据保存验证。
+- `src/waveguide_sim/viewer.py` 与 `tests/test_field_viewer.py`：已有光场的x/y/z滑块查看及验证，独立于求解器。
 - [模型、参数单位、接口与限制](docs/agent/rk4-package.md)。
 - [当前清理和验证记录](docs/reports/python-only-20261031.md)。
 

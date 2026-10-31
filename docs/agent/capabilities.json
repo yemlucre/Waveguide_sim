@@ -13,9 +13,12 @@
       "source": "src/waveguide_sim/solver.py",
       "geometrySource": "src/waveguide_sim/geometry.py",
       "pythonEntryPoint": "src/waveguide_sim/__main__.py",
+      "visualizationSource": "src/waveguide_sim/viewer.py",
       "contract": "docs/agent/rk4-package.md",
+      "installDependencies": ["numpy>=1.24", "matplotlib>=3.7"],
+      "visualization": "Optional viewer module: view_field(field, axes_um, z_um) browses in-memory (Nz,Nx,Ny) envelopes; view_npz(path) and python -m waveguide_sim.viewer PATH load an NPZ once. Discrete physical x/y/z sliders select saved nodes, update slice intensity/phase, and read the complex value. Intensity uses a fixed global scale, phase [-pi,pi]; no propagation, interpolation or writes. Tutorial sections 4 and 9 save a static PNG then default to the viewer, controlled by SHOW_PLOT and INTERACTIVE_VIEWER. Solver and built-in simulation CLI do not invoke Matplotlib.",
       "operation": "simulate(Grid, absolute_index_callback_or_Waveguide, complex_array_or_launch_callable): Fourier transverse Laplacian, classical four-stage fourth-order RK4 along z, every-step transverse field history by default, amplitude/phase preservation without normalization; numeric NPZ export refuses overwrite. check_convergence rebuilds launch and geometry on half-step, half-spacing and enlarged-window grids. No UI/device/Agent dependency.",
-      "verification": "2026-10-31: retained RK4 scientific checks plus grid validation; package-only entry and installed-wheel E2E. See docs/reports/python-only-20261031.md. Historical initial validation: docs/reports/rk4-package-20261030.md.",
+      "verification": "2026-10-31: retained RK4 scientific checks plus grid validation; package-only entry and installed-wheel E2E. See docs/reports/python-only-20261031.md. Matplotlib dependency and tutorial plotting verification: docs/reports/matplotlib-20261031.md. Interactive viewer checks: docs/reports/field-viewer-20261031.md. Historical initial validation: docs/reports/rk4-package-20261030.md.",
       "limitations": "All demo physical parameters assumed_not_measured. Scalar forward weak-index paraxial model, one/two transverse dimensions, periodic boundary, no absorber/reflection/polarization/nonlinearity/CAD import/calibration or registered Agent tools. Explicit RK4 has a conservative grid-dependent step bound and is not exactly unitary. All positions means discrete grid nodes; 16 million stored complex values, max 100000 steps. Trusted coordinate callbacks must be deterministic and resolvable; discontinuities can reduce convergence order. Supplied field units determine intensity/power units."
     }
   ]

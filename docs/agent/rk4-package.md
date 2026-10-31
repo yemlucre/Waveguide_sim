@@ -1,6 +1,6 @@
 # Python 仿真包契约 v0.2
 
-检查日期：2026-10-31。能力 `optics.rk4_field_simulation`；正式包 `src/waveguide_sim/`，仅依赖 NumPy。独立理论计算，无设备操作或 Agent/MCP 注册，agentExposed=false。示例全部为 `assumed_not_measured`。v0.2移除全部旧报告/分步流程和未被RK4使用的Grid.samples参数，数值方程、RK4推进及误差判据不变。
+检查日期：2026-10-31。能力 `optics.rk4_field_simulation`；正式包 `src/waveguide_sim/`，安装依赖为 NumPy>=1.24 和 Matplotlib>=3.7。求解器只使用NumPy；Matplotlib用于调用方绘图。独立理论计算，无设备操作或 Agent/MCP 注册，agentExposed=false。示例全部为 `assumed_not_measured`。v0.2移除全部旧报告/分步流程和未被RK4使用的Grid.samples参数，数值方程、RK4推进及误差判据不变。
 
 ## 安装与编程入口
 
@@ -30,7 +30,7 @@ checks = check_convergence(grid, guide, launch)
 result.save('my_new_fields.npz')    # 文件已存在则拒绝覆盖
 ```
 
-`python -m waveguide_sim` 执行包内二维弯曲渐变折射率示例，保存每个传播步场和收敛结果到新建 `artifacts/rk4/<时间戳>/`。`--output` 可指定新的目录，已有目录即拒绝。只计算与导出，不依赖报告、Pillow 或浏览器。结果退出0表示数值检查通过，2表示未通过，配置/用户回调异常直接抛出并以非零退出。失败留下已写文件。
+`python -m waveguide_sim` 执行包内二维弯曲渐变折射率示例，保存每个传播步场和收敛结果到新建 `artifacts/rk4/<时间戳>/`。`--output` 可指定新的目录，已有目录即拒绝。只计算与导出，不调用报告流程、Matplotlib绘图或浏览器。结果退出0表示数值检查通过，2表示未通过，配置/用户回调异常直接抛出并以非零退出。失败留下已写文件。
 
 ## 模型、单位与坐标
 
@@ -71,12 +71,22 @@ Result 提供 grid、axes_um、z_um、field、intensity、power、diagnostics；
 
 NPZ 包含 field、z_um、x_um、可选y_um、power、metadata_json；读取 `allow_pickle=False`。元数据含完整Grid、模型名、诊断和未由包标定的参数来源标记。通用API不自动保存用户回调源码，调用方应归档几何/材料来源；示例入口额外保存 input.json、result.json 和包源码/输出哈希 manifest.json。
 
+教程第4节的二维调用脚本先保存 `fields.npz` 和 `checks.json`，再用Matplotlib生成 `propagation.png`：左图为 `sum(|field|², axis=y)*dy` 的x-z分布，右图为末端x-y强度，转置匹配绘图坐标。沿y积分后的单位为场单位平方×µm，输出面强度为场单位平方；不自动标定为实测光强。`SHOW_PLOT=True`、`INTERACTIVE_VIEWER=True` 默认显示下述滑块查看器；关闭交互开关则显示静态传播图。`SHOW_PLOT=False` 只保存PNG，无界面环境需使用非交互后端。可选终端数据查询默认关闭，通过 `INSPECT_DATA=True` 启用。顶部说明网格、几何、入射场、输出目录及存储间隔的修改位置。第9节支持独立读取已有二维NPZ画图，从文件坐标取得间距，在新的子目录保存图片，再直接用已读取的数组启动查看器。验证见 `docs/reports/matplotlib-20261031.md` 和 `docs/reports/field-viewer-20261031.md`。
+
+## 光场交互查看
+
+独立模块 `src/waveguide_sim/viewer.py` 提供 `view_field(field, axes_um, z_um, show=True)`、`view_npz(path, show=True)`；show为仅关键字参数，默认阻塞显示，返回 `FieldViewer`。`view_field(result.field, result.axes_um, result.z_um)` 引用已有复场数组；`view_npz` 用 `allow_pickle=False` 一次读入field和x/y/z坐标，关闭NPZ后在内存中浏览。命令行 `python -m waveguide_sim.viewer PATH` 只打开已有文件，不运行传播，不写入原文件或其他输出。包的基础导入、求解器和仿真CLI不导入此模块或Matplotlib。
+
+输入限定为有限数值复场/实场 `(Nz,Nx,Ny)`，两条均匀递增横向轴与递增z轴，长度与数组匹配，各轴至少两个节点；z可不均匀，以保留稀疏存储末端的实际坐标。一维横截面不支持。三个滑块用实际坐标数组作为离散步点，z控制截面，x/y控制十字线和点值；显示复包络、|psi|²及相位rad，不插值。中图强度在整个场历史上使用固定色标，右图包络相位固定[-π,π]；零场点的相位文本为undefined，弱场相位不应独立解释。x-z积分图和z标线对应真实坐标。
+
+查看器按截面预计算x-z积分图与全局强度上限，仅为当前截面生成强度/相位数组；保留整块复场内存，不复制完整强度/相位体积。仍受仿真1600万存储复值预算及实际可用内存限制；默认 `store_every=1` 保存所有传播步，较大值只允许查看已保存的截面。图窗需要交互后端，静态Notebook inline图或PNG不保留可拖动控件。show=False用于调用方管理图窗，需保留返回对象并适时 `plt.close(viewer.figure)`。查看器不判断收敛、不重新标定参数，也不改变原始光场或物理模型。
+
 ## 限制与入口
 
 仅单向、线性、标量、弱导引傍轴，周期横向边界，无吸收层、偏振、背反射、矢量Maxwell、非线性或实测材料模型。2+1D 场传播不代表任意三维电磁结构。触边/欠采样仍返回用于诊断的场，但 checks 为false；不自动修正或重新归一化掩盖误差。RK4不严格守恒，需要用功率漂移检查。
 
-旧报告入口、HTML/JS模板、分步求解流程、旧场景协议及专用演示均已删除。`python simulate.py` 为源目录便利入口，执行与 `python -m waveguide_sim` 相同的包内示例，只接受 `--output` 等包CLI参数。旧 `--scene`、`--parameters`、`--open-report` 和 PowerShell 的场景/报告参数不再支持。`simulate-optics.ps1` 仅是调用Python入口/测试的本机助手，无报告或Pillow依赖。
+旧报告入口、HTML/JS模板、分步求解流程、旧场景协议及专用演示均已删除。`python simulate.py` 为源目录便利入口，执行与 `python -m waveguide_sim` 相同的包内示例，只接受 `--output` 等包CLI参数。旧 `--scene`、`--parameters`、`--open-report` 和 PowerShell 的场景/报告参数不再支持。`simulate-optics.ps1` 仅是调用Python入口/测试的本机助手，不调用报告或绘图流程。
 
-验证：`simulate-optics.ps1 -Test` 运行 `tests/test_optics_rk4.py`；覆盖网格/加密协议、解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。当前记录见 `docs/reports/python-only-20261031.md`；首次包验证记录 `docs/reports/rk4-package-20261030.md` 为历史证据，其旧入口/文件路径不再作为当前能力说明。
+验证：`simulate-optics.ps1 -Test` 运行 `tests/test_*.py`；RK4检查覆盖网格/加密协议、解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。`tests/test_field_viewer.py` 覆盖非方形网格的截面/点值/相位方向、固定色标、不均匀z、NPZ只读一次且拖动不重算、非法输入和零场相位。当前记录见 `docs/reports/python-only-20261031.md` 及查看器记录；首次包验证记录 `docs/reports/rk4-package-20261030.md` 为历史证据，其旧入口/文件路径不再作为当前能力说明。
 
 方法参考：[经典RK4系数及稳定区间](https://ketch.github.io/numipedia/methods/RK44.html)。
