@@ -3,9 +3,13 @@ param([string]$Python, [string]$Output, [switch]$Test)
 $ErrorActionPreference = 'Stop'
 $env:PYTHONIOENCODING = 'utf-8'
 if (-not $Python) {
-    $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
-    if (Test-Path -LiteralPath $bundled) { $Python = $bundled }
-    else { $Python = (Get-Command python -ErrorAction Stop).Source }
+    $projectPython = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+    if (Test-Path -LiteralPath $projectPython) { $Python = $projectPython }
+    else {
+        $bundled = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+        if (Test-Path -LiteralPath $bundled) { $Python = $bundled }
+        else { $Python = (Get-Command python -ErrorAction Stop).Source }
+    }
 }
 if ($Test) {
     & $Python -m unittest discover -s (Join-Path $PSScriptRoot 'tests') -p 'test_*.py' -v

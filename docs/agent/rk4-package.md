@@ -71,7 +71,7 @@ Result 提供 grid、axes_um、z_um、field、intensity、power、diagnostics；
 
 NPZ 包含 field、z_um、x_um、可选y_um、power、metadata_json；读取 `allow_pickle=False`。元数据含完整Grid、模型名、诊断和未由包标定的参数来源标记。通用API不自动保存用户回调源码，调用方应归档几何/材料来源；示例入口额外保存 input.json、result.json 和包源码/输出哈希 manifest.json。
 
-教程第4节的二维调用脚本先保存 `fields.npz` 和 `checks.json`，再用Matplotlib生成 `propagation.png`：左图为 `sum(|field|², axis=y)*dy` 的x-z分布，右图为末端x-y强度，转置匹配绘图坐标。沿y积分后的单位为场单位平方×µm，输出面强度为场单位平方；不自动标定为实测光强。`SHOW_PLOT=True`、`INTERACTIVE_VIEWER=True` 默认显示下述滑块查看器；关闭交互开关则显示静态传播图。`SHOW_PLOT=False` 只保存PNG，无界面环境需使用非交互后端。可选终端数据查询默认关闭，通过 `INSPECT_DATA=True` 启用。顶部说明网格、几何、入射场、输出目录及存储间隔的修改位置。第9节支持独立读取已有二维NPZ画图，从文件坐标取得间距，在新的子目录保存图片，再直接用已读取的数组启动查看器。验证见 `docs/reports/matplotlib-20261031.md` 和 `docs/reports/field-viewer-20261031.md`。
+教程第4节的二维调用脚本先保存 `fields.npz` 和 `checks.json`，再用Matplotlib生成 `propagation.png`：左图为 `sum(|field|², axis=y)*dy` 的x-z分布，右图为末端x-y强度，转置匹配绘图坐标。沿y积分后的单位为场单位平方×µm，输出面强度为场单位平方；不自动标定为实测光强。`SHOW_PLOT=True`、`INTERACTIVE_VIEWER=True` 默认显示下述滑块查看器；关闭交互开关则显示静态传播图。`SHOW_PLOT=False` 只保存PNG，无界面环境需使用非交互后端。可选终端数据查询默认关闭，通过 `INSPECT_DATA=True` 启用。顶部说明网格、几何、入射场、输出目录及存储间隔的修改位置。第9节支持独立读取已有二维NPZ画图，从文件坐标取得间距，在新的子目录保存图片，再直接用已读取的数组启动查看器。验证见 [当前验证说明](../validation.md)。
 
 ## 光场交互查看
 
@@ -85,8 +85,8 @@ NPZ 包含 field、z_um、x_um、可选y_um、power、metadata_json；读取 `al
 
 仅单向、线性、标量、弱导引傍轴，周期横向边界，无吸收层、偏振、背反射、矢量Maxwell、非线性或实测材料模型。2+1D 场传播不代表任意三维电磁结构。触边/欠采样仍返回用于诊断的场，但 checks 为false；不自动修正或重新归一化掩盖误差。RK4不严格守恒，需要用功率漂移检查。
 
-旧报告入口、HTML/JS模板、分步求解流程、旧场景协议及专用演示均已删除。`python simulate.py` 为源目录便利入口，执行与 `python -m waveguide_sim` 相同的包内示例，只接受 `--output` 等包CLI参数。旧 `--scene`、`--parameters`、`--open-report` 和 PowerShell 的场景/报告参数不再支持。`simulate-optics.ps1` 仅是调用Python入口/测试的本机助手，不调用报告或绘图流程。
+`python simulate.py` 为源目录便利入口，执行与 `python -m waveguide_sim` 相同的包内示例，只接受 `--output` 等包CLI参数。`simulate-optics.ps1` 仅是调用Python入口/测试的本机助手，优先使用项目 `.venv`，也可通过 `-Python` 指定解释器。旧场景/报告入口及对应参数已移除。
 
-验证：`simulate-optics.ps1 -Test` 运行 `tests/test_*.py`；RK4检查覆盖网格/加密协议、解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。`tests/test_field_viewer.py` 覆盖非方形网格的截面/点值/相位方向、固定色标、不均匀z、NPZ只读一次且拖动不重算、非法输入和零场相位。当前记录见 `docs/reports/python-only-20261031.md` 及查看器记录；首次包验证记录 `docs/reports/rk4-package-20261030.md` 为历史证据，其旧入口/文件路径不再作为当前能力说明。
+验证：`simulate-optics.ps1 -Test` 运行 `tests/test_*.py`；RK4检查覆盖网格/加密协议、解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。`tests/test_field_viewer.py` 覆盖非方形网格的截面/点值/相位方向、固定色标、不均匀z、NPZ只读一次且拖动不重算、非法输入和零场相位。当前测试覆盖、收敛结果及保留的历史证据位置见 [验证说明](../validation.md)。
 
 方法参考：[经典RK4系数及稳定区间](https://ketch.github.io/numipedia/methods/RK44.html)。

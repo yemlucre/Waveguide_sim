@@ -2,9 +2,9 @@
 
 适用版本：0.2.0；更新日期：2026-10-31。教程中的波长、折射率和几何参数全部为 `assumed_not_measured`，用于学习，未按真实器件标定。
 
-示例核验：二维完整脚本、数据读取及一维示例已运行；二维主运行与收敛检查通过。本次绘图与依赖核验见 [Matplotlib 验证记录](reports/matplotlib-20261031.md)。
+示例核验：二维完整脚本、数据读取及一维示例已运行；二维主运行与收敛检查通过。测试覆盖、绘图及交互检查见 [当前验证说明](validation.md)。
 
-一次仿真已得到所有已保存网格点的复光场：`result.field[iz, ix, iy]`。默认 `STORE_EVERY=1` 保存每个传播步，之后可直接拖动x/y/z滑块查看，**无需为每个观察位置重新仿真**。已有NPZ也可用 `python -m waveguide_sim.viewer 路径/fields.npz` 打开。交互查看说明与验证见 [滑块查看器记录](reports/field-viewer-20261031.md)。
+一次仿真已得到所有已保存网格点的复光场：`result.field[iz, ix, iy]`。默认 `STORE_EVERY=1` 保存每个传播步，之后可直接拖动x/y/z滑块查看，**无需为每个观察位置重新仿真**。已有NPZ也可用 `python -m waveguide_sim.viewer 路径/fields.npz` 打开。
 
 ## 1. 这个包做什么
 
