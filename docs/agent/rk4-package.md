@@ -1,6 +1,6 @@
-# Python 仿真包契约 v0.1
+# Python 仿真包契约 v0.2
 
-检查日期：2026-10-30。能力 `optics.rk4_field_simulation`；正式包 `src/waveguide_sim/`，仅依赖 NumPy。独立理论计算，无设备操作或 Agent/MCP 注册，agentExposed=false。示例全部为 `assumed_not_measured`。
+检查日期：2026-10-31。能力 `optics.rk4_field_simulation`；正式包 `src/waveguide_sim/`，仅依赖 NumPy。独立理论计算，无设备操作或 Agent/MCP 注册，agentExposed=false。示例全部为 `assumed_not_measured`。v0.2移除全部旧报告/分步流程和未被RK4使用的Grid.samples参数，数值方程、RK4推进及误差判据不变。
 
 ## 安装与编程入口
 
@@ -54,7 +54,7 @@ psi_next = psi + h*(k1+2*k2+2*k3+k4)/6
 
 ## 输入与采样
 
-- `Grid` 复用公共网格对象：横向1或2维，每轴32..1024点、4的倍数、正窗口；正波长、背景n、总长、步长；最多100000步。`Grid.samples` 是旧报告参数（仍须满足其类型/范围验证），**新 simulate 不用它决定存储截面**。
+- `Grid` 定义于 `src/waveguide_sim/grid.py`：横向1或2维，每轴32..1024点、4的倍数、正窗口；正波长、背景n、总长、步长；最多100000步。截面保存仅由 `simulate(..., store_every=...)` 控制。v0.1传入的 `samples` 参数请删除，v0.2不再接受该参数；实际存储预算在simulate中根据真实保存步数检查。
 - `Waveguide(shape,core_index,cladding_index)`：shape(z_um,q) 返回广播到网格的0..1布尔/连续权重，n=n_clad+(n_core−n_clad)*weight。可以描述圆/椭圆/矩形截面、弯曲、渐变等；不是自动网格化 CAD/STL 导入器。
 - 或直接提供 `refractive_index(z_um,q)`，返回绝对实折射率，可为标量或可广播数组。支持多芯、分叉、自定义渐变介质。必须 n>0、|n−n0|/n0≤0.01；各 RK4 阶段都验证。q 为稀疏物理坐标，一维 `(x,)`，二维 `(x[:,None],y[None,:])`。
 - `initial_field` 是同形有限非零复数组，或 `launch(q)`；不得依赖固定网格，否则不能做网格收敛。复数直接保存相干幅相。`gaussian_beam` 辅助函数的 waists_um 是场1/e半宽，transverse_k_per_um 是相位梯度 rad/µm。
@@ -71,12 +71,12 @@ Result 提供 grid、axes_um、z_um、field、intensity、power、diagnostics；
 
 NPZ 包含 field、z_um、x_um、可选y_um、power、metadata_json；读取 `allow_pickle=False`。元数据含完整Grid、模型名、诊断和未由包标定的参数来源标记。通用API不自动保存用户回调源码，调用方应归档几何/材料来源；示例入口额外保存 input.json、result.json 和包源码/输出哈希 manifest.json。
 
-## 限制与兼容
+## 限制与入口
 
 仅单向、线性、标量、弱导引傍轴，周期横向边界，无吸收层、偏振、背反射、矢量Maxwell、非线性或实测材料模型。2+1D 场传播不代表任意三维电磁结构。触边/欠采样仍返回用于诊断的场，但 checks 为false；不自动修正或重新归一化掩盖误差。RK4不严格守恒，需要用功率漂移检查。
 
-旧 `simulate.py`、旧报告入口及分步求解流程作为兼容历史入口继续存在，不调用新 RK4。原 `bpm.py` 的唯一正式实现迁至 `src/waveguide_sim/bpm.py`，旧路径只保留导入适配，不创建并行数值源码。新编程工作从包导入并调用 simulate。
+旧报告入口、HTML/JS模板、分步求解流程、旧场景协议及专用演示均已删除。`python simulate.py` 为源目录便利入口，执行与 `python -m waveguide_sim` 相同的包内示例，只接受 `--output` 等包CLI参数。旧 `--scene`、`--parameters`、`--open-report` 和 PowerShell 的场景/报告参数不再支持。`simulate-optics.ps1` 仅是调用Python入口/测试的本机助手，无报告或Pillow依赖。
 
-验证：`simulate-optics.ps1 -Test` 包含 `tests/test_optics_rk4.py`；覆盖解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。记录见 `docs/reports/rk4-package-20261030.md`。
+验证：`simulate-optics.ps1 -Test` 运行 `tests/test_optics_rk4.py`；覆盖网格/加密协议、解析平面波四阶率、纵变折射率四阶段、二维高斯解析复场、几何/幅相/全步保存、不稳定与非法输入、弯曲收敛、边界失败及NPZ拒绝覆盖。当前记录见 `docs/reports/python-only-20261031.md`；首次包验证记录 `docs/reports/rk4-package-20261030.md` 为历史证据，其旧入口/文件路径不再作为当前能力说明。
 
 方法参考：[经典RK4系数及稳定区间](https://ketch.github.io/numipedia/methods/RK44.html)。

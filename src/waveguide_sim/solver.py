@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import math
 from pathlib import Path
 import numpy as np
-from .bpm import Grid, axes, refinement_grids
+from .grid import Grid, axes, refinement_grids
 
 
 @dataclass
@@ -48,7 +48,6 @@ def simulate(grid, refractive_index, initial_field, *, store_every=1):
     initial_field is a grid-shaped complex array or callable(sparse_coordinates).
     No input or step normalization; input amplitude and phase are preserved.
     Default saves every integration plane; store_every=N saves every Nth plus end.
-    Grid.samples belongs to legacy reporting and is ignored by this API.
     """
     grid.validate()
     if not callable(refractive_index):

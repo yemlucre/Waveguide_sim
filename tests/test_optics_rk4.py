@@ -10,6 +10,21 @@ from waveguide_sim import Grid, axes, Waveguide, gaussian_beam, simulate, check_
 
 
 class RK4FrameworkChecks(unittest.TestCase):
+    def test_grid_axes_and_validation(self):
+        from waveguide_sim.grid import refinement_grids
+        g = self.grid()
+        np.testing.assert_array_equal(axes(g)[0],np.arange(-16,16))
+        self.assertNotIn('samples',g.__dataclass_fields__)
+        refined = refinement_grids(g)
+        self.assertEqual(refined[1].step_um,.05)
+        self.assertEqual(refined[2].points,(64,))
+        self.assertEqual(refined[3].windows_um,(48.,))
+        for changes in (dict(points=(31,)),dict(windows_um=(-1.,)),
+                        dict(wavelength_um=float('nan')),dict(step_um=0.),
+                        dict(points=(32,32)),dict(length_um=100001.,step_um=1.)):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):
+                replace(g,**changes).validate()
+
     def grid(self, **kw):
         return replace(Grid(windows_um=(32.,),points=(32,),length_um=10.,step_um=.1),**kw)
 
